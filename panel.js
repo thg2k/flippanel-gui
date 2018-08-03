@@ -287,6 +287,8 @@ Panel.Canvas = {
 
 };
 
+var publish_lock = 0;
+
 /**
  * ...
  */
@@ -306,14 +308,33 @@ Panel.Remote = {
   },
 
   publish: function() {
+    if (publish_lock) {
+      console.log("Panel.Remote.publish(): Publishing lock, waiting");
+      return;
+    }
     console.log("Panel.Remote.publish(): Sending panel data for publication");
+    publish_lock = 1;
 
     // acquire the data
     var data = Panel.Data.pack(Panel.Canvas.acquire());
     $.post("?a=publish", { "d": data }, function() {
       console.log("DONE");
+      publish_lock = 0;
+    }).fail(function(err) {
+      console.log("FAIL", err);
+      alert('Failed: ' + err.responseText);
+      publish_lock = 0;
     });
   },
+
+  renderText: function(text, callback) {
+    console.log("Panel.Remote.renderText(): Sending text data for renderization");
+
+    $.post("?a=render", { "t": text }, function(response) {
+      console.log("Got render data = " + response);
+      callback(response);
+    }, "text");
+  }
 };
 
 $(function() {

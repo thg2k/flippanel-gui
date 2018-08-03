@@ -40,7 +40,15 @@ $(function() {
     case 'publish':
       Panel.Remote.publish();
       break;
-      
+
+    case 'render-text':
+      var txt = $("input[name=\"render-text\"]").val();
+      Panel.Remote.renderText(txt, function(response) {
+        var data = Panel.Data.unpack(response);
+        Panel.Canvas.draw(data);
+      });
+      break;
+
     case 'save':
       var bits = Panel.Canvas.acquire();
       var data = Panel.Data.pack(bits);
@@ -109,11 +117,17 @@ $(function() {
   </ul>
 </div>
 
+<div class="gui-text-renderer">
+  <input type="text" name="render-text" />
+  <button type="button" name="action" value="render-text">Render text</button>
+</div>
+
 <div>
-  <textarea id="datadump" cols="60" rows="20"></textarea>
+  <textarea id="datadump" cols="92" rows="8"></textarea>
   <button type="button" name="action" value="save">Save</button>
   <button type="button" name="action" value="load">Load</button>
 </div>
+
 
 <canvas id="preview" width="90" height="24" style="border: 2px solid #7f7f7f;"></canvas>
 
