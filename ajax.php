@@ -10,11 +10,13 @@ function do_transmit($data) {
     fwrite($fd, data);
 
     $inv_data = invert_data($data);
-    // system("stty 156200 cs8 -parenb -cstopb ixon -F /dev/ttyUSB0");
-    // $usb = fopen("/dev/ttyUSB0", "w");
-    // fwrite($usb, "d" . $data);
-    // fclose($usb);
-    sleep(5);
+    //system("stty 156200 cs8 -parenb -cstopb ixon -F /dev/ttyUSB0");
+    system("stty -F /dev/ttyUSB0 9600 -parenb");
+    $usb = fopen("/dev/ttyUSB0", "w");
+    sleep(2);
+    fwrite($usb, "d" . $inv_data);
+    sleep(1);
+    fclose($usb);
 
     flock($fd, LOCK_UN);
     fclose($fd);
@@ -72,6 +74,10 @@ function invert_data($data) {
       }
       $col_hex_rev .= sprintf("%02X", $newbyte);
     }
+    $col_hex = $col_hex_rev;
+    $col_hex_rev = substr($col_hex, 4, 2) .
+	substr($col_hex,2,2) . substr($col_hex,0,2);
+
     $retval .= $col_hex_rev;
   }
   // var_dump($retval);
